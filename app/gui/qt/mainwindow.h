@@ -129,8 +129,15 @@ private slots:
     void helpClosed(bool visible);
 
 private:
+<<<<<<< HEAD
     void startServer();
     void waitForServiceSync();
+=======
+    void addKeyBinding(QSettings &qs, int cmd, int key);
+    void addOtherKeyBinding(QSettings &qs, int cmd, int key);
+    void initWorkspace(SonicPiScintilla* ws);
+    void startOSCListener();
+>>>>>>> origin/keybindings
     void clearOutputPanels();
     void createShortcuts();
     void createToolBar();

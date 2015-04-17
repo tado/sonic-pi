@@ -56,11 +56,18 @@
 #include <QShortcut>
 #include <QToolButton>
 #include <QSettings>
+<<<<<<< HEAD
 #include <QScrollBar>
+=======
+>>>>>>> origin/keybindings
 
 // QScintilla stuff
 #include <Qsci/qsciapis.h>
 #include <Qsci/qsciscintilla.h>
+<<<<<<< HEAD
+=======
+#include <Qsci/qscicommandset.h>
+>>>>>>> origin/keybindings
 
 #include "sonicpilexer.h"
 #include "sonicpiapis.h"
@@ -486,6 +493,172 @@ void MainWindow::initPrefsWindow() {
   grid->addWidget(update_box, 2, 0);
   prefsCentral->setLayout(grid);
 
+<<<<<<< HEAD
+=======
+ void MainWindow::addOtherKeyBinding(QSettings &qs, int cmd, int key)
+ {
+   QString skey;
+   skey.sprintf("/Scintilla/keymap/c%d/alt", cmd);
+   qs.setValue(skey, key);
+ }
+
+  void MainWindow::addKeyBinding(QSettings &qs, int cmd, int key)
+ {
+   QString skey;
+   skey.sprintf("/Scintilla/keymap/c%d/key", cmd);
+   qs.setValue(skey, key);
+ }
+
+ void MainWindow::initWorkspace(SonicPiScintilla* ws) {
+   ws->standardCommands()->clearKeys();
+   ws->standardCommands()->clearAlternateKeys();
+   QString skey;
+   QSettings settings("Sonic Pi", "Key bindings");
+
+#if defined(Q_OS_MAC)
+   int SPi_CTRL = Qt::META;
+   int SPi_META = Qt::CTRL;
+#else
+   int SPi_CTRL = Qt::CTRL;
+   int SPi_META = Qt::ALT;
+#endif
+
+
+   // basic navigation
+  addKeyBinding(settings, QsciCommand::LineDown, Qt::Key_N | SPi_CTRL);
+  addOtherKeyBinding(settings, QsciCommand::LineDown, Qt::Key_Down);
+  addKeyBinding(settings, QsciCommand::LineDownExtend, Qt::Key_Down | Qt::SHIFT);
+
+  addKeyBinding(settings, QsciCommand::LineUp, Qt::Key_P | SPi_CTRL);
+  addOtherKeyBinding(settings, QsciCommand::LineUp, Qt::Key_Up);
+  addKeyBinding(settings, QsciCommand::LineUpExtend, Qt::Key_Up | Qt::SHIFT);
+
+  addKeyBinding(settings, QsciCommand::CharRight, Qt::Key_F | SPi_CTRL);
+  addOtherKeyBinding(settings, QsciCommand::CharRight, Qt::Key_Right);
+  addKeyBinding(settings, QsciCommand::CharRightExtend, Qt::Key_Right | Qt::SHIFT);
+
+  addKeyBinding(settings, QsciCommand::WordRight, Qt::Key_F | SPi_CTRL | Qt::SHIFT);
+  addOtherKeyBinding(settings, QsciCommand::WordRight, Qt::Key_Right | SPi_CTRL);
+  addKeyBinding(settings, QsciCommand::WordRightExtend, Qt::Key_Right | SPi_CTRL | Qt::SHIFT);
+
+  addKeyBinding(settings, QsciCommand::CharLeft, Qt::Key_B | SPi_CTRL);
+  addOtherKeyBinding(settings, QsciCommand::CharLeft, Qt::Key_Left);
+  addKeyBinding(settings, QsciCommand::CharLeftExtend, Qt::Key_Left | Qt::SHIFT);
+
+  addKeyBinding(settings, QsciCommand::WordLeft, Qt::Key_B | SPi_CTRL | Qt::SHIFT);
+  addOtherKeyBinding(settings, QsciCommand::WordLeft, Qt::Key_Left | SPi_CTRL);
+  addKeyBinding(settings, QsciCommand::WordLeftExtend, Qt::Key_Left | SPi_CTRL | Qt::SHIFT);
+
+  addKeyBinding(settings, QsciCommand::Delete, Qt::Key_D | SPi_CTRL);
+  addKeyBinding(settings, QsciCommand::DeleteBack, Qt::Key_H | SPi_CTRL);
+  addOtherKeyBinding(settings, QsciCommand::DeleteBack, Qt::Key_Backspace);
+
+  addKeyBinding(settings, QsciCommand::Home, Qt::Key_A | SPi_CTRL);
+  addKeyBinding(settings, QsciCommand::LineEnd, Qt::Key_E | SPi_CTRL);
+
+  addKeyBinding(settings, QsciCommand::Delete, Qt::Key_D | SPi_CTRL);
+  addKeyBinding(settings, QsciCommand::DeleteLineRight, Qt::Key_K | SPi_CTRL);
+  addKeyBinding(settings, QsciCommand::VerticalCentreCaret, Qt::Key_L | SPi_CTRL);
+
+  addKeyBinding(settings, QsciCommand::Cancel, Qt::Key_Escape);
+
+  // tab return
+  addKeyBinding(settings, QsciCommand::Newline, Qt::Key_Return);
+  addKeyBinding(settings, QsciCommand::Tab, Qt::Key_Tab);
+
+  // copy paste
+  addKeyBinding(settings, QsciCommand::SelectionCut, Qt::Key_X | SPi_META);
+  addKeyBinding(settings, QsciCommand::SelectionCopy, Qt::Key_C | SPi_META);
+  addKeyBinding(settings, QsciCommand::Paste, Qt::Key_V | SPi_META);
+  addKeyBinding(settings, QsciCommand::Undo, Qt::Key_Z | SPi_META);
+  addKeyBinding(settings, QsciCommand::Redo, Qt::Key_Z | Qt::SHIFT | SPi_META);
+  addKeyBinding(settings, QsciCommand::SelectAll, Qt::Key_A | SPi_META);
+
+  ws->standardCommands()->readSettings(settings);
+
+  ws->setAutoIndent(true);
+  ws->setIndentationsUseTabs(false);
+  ws->setBackspaceUnindents(true);
+  ws->setTabIndents(true);
+  ws->setMatchedBraceBackgroundColor(QColor("dimgray"));
+  ws->setMatchedBraceForegroundColor(QColor("white"));
+
+  ws->setIndentationWidth(2);
+  ws->setIndentationGuides(true);
+  ws->setIndentationGuidesForegroundColor(QColor("deep pink"));
+  ws->setBraceMatching( SonicPiScintilla::SloppyBraceMatch);
+  //TODO: add preference toggle for this:
+  //ws->setFolding(SonicPiScintilla::CircledTreeFoldStyle, 2);
+  ws->setCaretLineVisible(true);
+  ws->setCaretLineBackgroundColor(QColor("whitesmoke"));
+  ws->setFoldMarginColors(QColor("whitesmoke"),QColor("whitesmoke"));
+  ws->setMarginLineNumbers(0, true);
+  ws->setMarginWidth(0, "1000000");
+  ws->setMarginsBackgroundColor(QColor("whitesmoke"));
+  ws->setMarginsForegroundColor(QColor("dark gray"));
+  ws->setMarginsFont(QFont("Menlo",5, -1, true));
+  ws->setUtf8(true);
+  ws->setText("#loading...");
+  ws->setLexer(lexer);
+  ws->setAutoCompletionThreshold(1);
+  ws->setAutoCompletionSource(SonicPiScintilla::AcsAPIs);
+  ws->setSelectionBackgroundColor("DeepPink");
+  ws->setSelectionForegroundColor("white");
+  ws->setCaretWidth(5);
+  ws->setCaretForegroundColor("deep pink");
+
+}
+
+void MainWindow::startOSCListener() {
+  std::cout << "starting OSC Server" << std::endl;
+  int PORT_NUM = 4558;
+  UdpSocket sock;
+  sock.bindTo(PORT_NUM);
+  std::cout << "Listening on port 4558" << std::endl;
+  if (!sock.isOk()) {
+    std::cout << "Unable to listen to OSC messages on port 4558" << std::endl;
+  } else {
+    PacketReader pr;
+    PacketWriter pw;
+    osc_incoming_port_open = true;
+    while (sock.isOk() && cont_listening_for_osc) {
+
+      if (sock.receiveNextPacket(30 /* timeout, in ms */)) {
+        pr.init(sock.packetData(), sock.packetSize());
+        oscpkt::Message *msg;
+        while (pr.isOk() && (msg = pr.popMessage()) != 0) {
+
+
+          if (msg->match("/multi_message")){
+            int msg_count;
+            int msg_type;
+            int job_id;
+            std::string thread_name;
+            std::string runtime;
+            std::string s;
+            std::ostringstream ss;
+
+            Message::ArgReader ar = msg->arg();
+            ar.popInt32(job_id);
+            ar.popStr(thread_name);
+            ar.popStr(runtime);
+            ar.popInt32(msg_count);
+            QMetaObject::invokeMethod( outputPane, "setTextColor", Qt::QueuedConnection, Q_ARG(QColor, QColor("#5e5e5e")));
+            ss << "[Run " << job_id;
+            ss << ", Time " << runtime;
+            if(!thread_name.empty()) {
+              ss << ", Thread :" << thread_name;
+            }
+            ss << "]";
+            QMetaObject::invokeMethod( outputPane, "append", Qt::QueuedConnection,
+                                       Q_ARG(QString, QString::fromStdString(ss.str())) );
+
+            for(int i = 0 ; i < msg_count ; i++) {
+              ss.str("");
+              ss.clear();
+              ar.popInt32(msg_type);
+              ar.popStr(s);
+>>>>>>> origin/keybindings
 
 
   // Read in preferences from previous session
@@ -1025,6 +1198,15 @@ QKeySequence MainWindow::ctrlKey(char key)
 #endif
 }
 
+QKeySequence MainWindow::ctrlKey(char key)
+{
+#ifdef Q_OS_MAC
+  return QKeySequence(QString("Meta+%1").arg(key));
+#else
+  return QKeySequence(QString("Ctrl+%1").arg(key));
+#endif
+}
+
 // Cmd on Mac, Alt everywhere else
 QKeySequence MainWindow::cmdAltKey(char key)
 {
@@ -1099,6 +1281,17 @@ void MainWindow::createToolBar()
   QAction *helpAct = new QAction(QIcon(":/images/help.png"), tr("Help"), this);
   setupAction(helpAct, 'I', tr("Toggle help pane"), SLOT(help()));
 
+<<<<<<< HEAD
+=======
+  new QShortcut(QKeySequence("F1"), this, SLOT(helpContext()));
+  new QShortcut(ctrlKey('i'), this, SLOT(helpContext()));
+
+  new QShortcut(cmdAltKey('['), this, SLOT(tabPrev()));
+  new QShortcut(cmdAltKey('{'), this, SLOT(tabPrev()));
+  new QShortcut(cmdAltKey(']'), this, SLOT(tabNext()));
+  new QShortcut(cmdAltKey('}'), this, SLOT(tabNext()));
+
+>>>>>>> origin/keybindings
   // Preferences
   QAction *prefsAct = new QAction(QIcon(":/images/prefs.png"), tr("Prefs"), this);
   setupAction(prefsAct, 'P', tr("Toggle preferences pane"),
@@ -1122,8 +1315,21 @@ void MainWindow::createToolBar()
   // Font Size Decrease
   QAction *textDecAct = new QAction(QIcon(":/images/size_down.png"),
 			    tr("Decrease Text Size"), this);
+<<<<<<< HEAD
   setupAction(textDecAct, '-', tr("Make text smaller"), SLOT(zoomFontOut()));
   new QShortcut(cmdAltKey('_'), this, SLOT(zoomFontOut()));
+=======
+  setupAction(textDecAct1, '-', tr("Make text smaller"), SLOT(zoomFontOut()));
+  textDecKey2 = new QShortcut(cmdAltKey('_'), this,
+			      SLOT(zoomFontOut()));
+
+  reloadKey = new QShortcut(cmdAltKey('U'), this, SLOT(reloadServerCode()));
+
+}
+
+void MainWindow::createToolBar()
+{
+>>>>>>> origin/keybindings
 
   QWidget *spacer = new QWidget();
   spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
